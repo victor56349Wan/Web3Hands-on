@@ -26,5 +26,5 @@ function mine(nickname, targetZeros) {
 
     const timeFor4Zeros = mine(nickname, 4);
     const timeFor5Zeros = mine(nickname, 5);
-    const timeForNZeros = mine(nickname, 6); // 可选，挖掘6个零的哈希
+    //const timeForNZeros = mine(nickname, 6); // 可选，挖掘6个零的哈希
 })();

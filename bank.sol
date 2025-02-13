@@ -13,7 +13,7 @@
  * - Only the admin can withdraw the total ETH from the contract.
  */
 
-pragma solidity >=0.8.0;
+pragma solidity >=0.8.28;
 
 contract Bank {
     // Total amount of ETH held by the contract
@@ -34,18 +34,18 @@ contract Bank {
     }
 
     // Function to withdraw all ETH from the contract
-    function withdrawAll() public {
+    function withdraw() public {
         // Ensure that only the admin can withdraw funds
         require(msg.sender == admin, 'Only owner could withdraw');
-
+        uint amount = totalETH;
         // Check that there is sufficient ETH to withdraw
-        require(address(this).balance >= totalETH, 'Insufficient ETH');
+        require(address(this).balance >= amount, 'Insufficient ETH');
 
         // Reset totalETH to zero before transferring to prevent re-entrancy
         totalETH = 0;
 
         // Transfer total ETH to the admin
-        admin.transfer(totalETH);
+        admin.transfer(amount);
     }
 
     // Receive function to allow the contract to accept ETH deposits

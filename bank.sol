@@ -16,45 +16,37 @@
 pragma solidity >=0.8.28;
 
 contract Bank {
-    // Total amount of ETH held by the contract
-    uint public totalETH;
 
     // Mapping to track the deposit balance for each address
     mapping(address => uint) public balances;
+    uint constant topN = 3;
+    // Array to store the top N depositors
+    address[topN] public topNLeaders;
 
-    // Array to store the top 3 depositors
-    address[3] public top3Leaders;
-
-    // Admin address (contract creator) with the ability to withdraw funds
-    address payable public admin;
+    // Admin address (contract creator by default) with the ability to withdraw funds
+    address public admin;
 
     // Constructor that sets the admin as the contract creator
     constructor() {
-        admin = payable(msg.sender);
+        admin = msg.sender;
     }
 
     // Function to withdraw all ETH from the contract
     function withdraw() public {
         // Ensure that only the admin can withdraw funds
         require(msg.sender == admin, 'Only owner could withdraw');
-        uint amount = totalETH;
         // Check that there is sufficient ETH to withdraw
-        require(address(this).balance >= amount, 'Insufficient ETH');
-
-        // Reset totalETH to zero before transferring to prevent re-entrancy
-        totalETH = 0;
+        
+        require(address(this).balance > 0, 'Insufficient ETH');
 
         // Transfer total ETH to the admin
-        admin.transfer(amount);
+        payable(admin).transfer(address(this).balance);
     }
 
     // Receive function to allow the contract to accept ETH deposits
     receive() external payable {
         // Update the balance for the sender
         balances[msg.sender] += msg.value;
-
-        // Update the total ETH held by the contract
-        totalETH += msg.value;
 
         // Update the leaderboard with the sender's address
         updateTopLeaders(msg.sender);
@@ -63,16 +55,16 @@ contract Bank {
     // Internal function to update the top 3 depositors in descending order
     function updateTopLeaders(address user) internal {
         // Loop through the top 3 leaderboard
-        for (uint8 i = 0; i < uint8(top3Leaders.length); i++) {
+        for (uint8 i = 0; i < uint8(topNLeaders.length); i++) {
             // Check if the current user's balance is greater than the current leader's balance
-            if (balances[user] > balances[top3Leaders[i]]) {
+            if (balances[user] > balances[topNLeaders[i]]) {
                 // Found the position for the current user
                 // Move members from i to len-2 to position i-1 to len-1
-                for (uint8 j = uint8(top3Leaders.length - 1); j > i; j--) {
-                    top3Leaders[j] = top3Leaders[j - 1]; // Shift leaders down
+                for (uint8 j = uint8(topNLeaders.length - 1); j > i; j--) {
+                    topNLeaders[j] = topNLeaders[j - 1]; // Shift leaders down
                 }
                 // Insert the user into the correct position in the leaderboard
-                top3Leaders[i] = user;   
+                topNLeaders[i] = user;   
                 break;  // Exit after insertion is done
             }
         }

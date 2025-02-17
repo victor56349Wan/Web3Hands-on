@@ -42,15 +42,18 @@ contract Bank is Owner{
         require(address(this).balance > 0, 'Insufficient ETH');
 
         // Transfer all ETH to owner
-        payable(Owner.owner).transfer(address(this).balance);
+        (bool success, ) = payable(Owner.owner).call{value: address(this).balance}(new bytes(0));
+        require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');        
     }
-    // Function to withdraw all ETH from this contract contract to specified address
+    // Function to withdraw all ETH from this contract to specified address
     function withdrawTo(address to) external onlyOwner(){
         // Check that there is sufficient ETH to withdraw
         require(address(this).balance > 0, 'Insufficient ETH');
 
         // Transfer total ETH to the specified 'to' address
-        payable(to).transfer(address(this).balance);
+
+        (bool success, ) = payable(to).call{value: address(this).balance}(new bytes(0));
+        require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');               
     }
     // Receive function to allow this contract to accept ETH deposits
     receive() external payable virtual{
@@ -112,10 +115,14 @@ contract Admin is Owner{
     function withdrawToOwner() external onlyOwner{
         uint amount = address(this).balance;
         require(amount > 0, 'Insufficient ETH');
-        payable(Owner.owner).transfer(amount);
+        
+        (bool success, ) = payable(Owner.owner).call{value: amount}(new bytes(0));
+        require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');
+
     }
     // allow to receive ETH
     receive() external payable {
 
     }
 }
+// instructor comments: withdraw 最好使用 call 方法转账

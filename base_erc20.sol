@@ -18,7 +18,6 @@ contract BaseERC20 is IERC20{
     constructor(string memory _name, string memory _symbol, uint8 _decimals, uint _totalSupply) {
         // write your code here
         // set name,symbol,decimals,totalSupply
-        /**/
         name = _name;
         symbol = _symbol;
         decimals = _decimals;

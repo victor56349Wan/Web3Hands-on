@@ -40,13 +40,12 @@ contract ExtERC20 is BaseERC20{
     } 
 
 }
-
 contract TokenBankV2 is TokenBank {
     constructor(address _extendedErc20Token) TokenBank(_extendedErc20Token){
     }
 
     function tokensReceived(uint amount, bytes memory data) external returns(bool){
-        require(msg.sender == address(erc20Token), "Not my supported ERC20" );
+        require(msg.sender == address(erc20Token), "Not my expected ERC20" );
         balances[tx.origin] += amount;
         return true;
     }
